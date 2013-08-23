@@ -1,0 +1,10 @@
+1) un cron care cauta toate feedurile si lanseaza aplicatia cu feedid ca argv
+
+2) caut subscriberi ii salvez intrun array
+
+3) caut articole. daca e ceva nou, dupa ce le inserez in mysql
+
+4) cand sunt inserate in mysql le iau IDul
+
+5) cu IDul le inserez sub forma (subscriber_id , article_id) in mysql.
+	* le inserez dupa fiecare articol nou
