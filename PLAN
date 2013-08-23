@@ -1,8 +1,11 @@
 1) un cron care cauta toate feedurile si lanseaza aplicatia cu feedid ca argv
+	'http://stiriromania.eu01.aws.af.cm/newssource/'
 
 2) caut subscriberi ii salvez intrun array
+	'http://37.139.8.146:1234/subscriber/feedid'
 
 3) caut articole. daca e ceva nou, dupa ce le inserez in mysql
+	new Parser
 
 4) cand sunt inserate in mysql le iau IDul
 
