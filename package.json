@@ -1,6 +1,9 @@
 {
- "name" : "add-unread-articles",
- "version": "0.0.1" , 
- "dependencies" :
-  { "request" : "2.x" }
+	"name" : "add-unread-articles",
+	"version": "0.0.1" ,
+	"dependencies" :
+		{
+			"request" : "2.x" ,
+			"async" : "0.x"
+		}
 }
