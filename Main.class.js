@@ -69,7 +69,6 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 			self.articles_proccessed ++ ;
 			if ( self.articles_proccessed === self.count )
 			{
-				console.log ( 'finished') ;
 				self.emit ( 'finished' ) ;
 			}
 		}
@@ -90,6 +89,12 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 		console.log ( 'Added to SOLR') ;
 		if ( err )
 			console.log ( err ) ;
+		self.articles_proccessed ++ ;
+		if ( self.articles_proccessed === self.count )
+		{
+			console.log ( 'finished') ;
+			self.emit ( 'finished' ) ;
+		}
 	}) ;
 
 	self.mysql.getConnection ( function ( err , mysql_con ) {
@@ -98,19 +103,14 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 
 		connection.query ( self.mysql_query , mysql_set , function ( err , res ) {
 			console.log ( 'Added to MySQL') ;
-
-			article = { id: res.insertId } ;
-			self.articles.push ( article ) ;
-
-			self.articles_proccessed ++ ;
-			if ( self.articles_proccessed === self.count )
-			{
-				console.log ( 'finished') ;
-				self.emit ( 'finished' ) ;
-			}
-
 			if ( err )
 				console.log ( err ) ;
+			else
+			{
+				article = { id: res.insertId } ;
+				self.articles.push ( article ) ;
+			}
+
 			connection.release();
 		}) ;
 

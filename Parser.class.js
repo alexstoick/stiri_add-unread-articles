@@ -62,6 +62,5 @@ Parser.prototype.emmitRequestFinished = function ( parent )
 {
 	var self = parent ;
 	self.end = new Date() ;
-	console.log ( "Duration: "  + (self.end - self.startDate) + " " + self.count ) ;
 	self.emit ( 'endParse' , self.count ) ;
 }

@@ -26,23 +26,28 @@ var mysql = mysql_lib.createPool ({
 	user : 'root',
 	passsword: 'Wireless123',
 	database: 'stiriAPI',
-	connectionLimit: 100
+	connectionLimit: 250
 }) ;
 
-
+mysql_insert_query = "INSERT INTO unread_articles SET ?"
 
 newssources_url = 'http://stiriromania.eu01.aws.af.cm/newssource/'
 subscriber_url = "http://37.139.8.146:1234/subscribers/"
 
+startProcessing();
 
+var total_of_inserts_required = 0 ;
+var inserts_completed = 0 ;
 
+var total_feeds = 0 ;
+var feeds_processed = 0 ;
 
 function startProcessing ()
 {
 	request(newssources_url , function ( error , response , body ) {
 
 		parsed = JSON.parse (body) ;
-		parsed = [ { "url": "http://www.theverge.com/rss/index.xml" , "id": 117 } ]
+		total_feeds = parsed.length ;
 		async.each ( parsed , processFeed , function ( err ) {
 			if ( err )
 				console.log ( err ) ;
@@ -54,10 +59,10 @@ function startProcessing ()
 
 function processFeed ( item , callback )
 {
-	url = item["url"] ;
+	feed_url = item["url"] ;
 	feed_id = item["id"] ;
 
-	async.parrallel ( [
+	async.parallel ( [
 		function ( p_callback ) {
 				url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
@@ -68,19 +73,71 @@ function processFeed ( item , callback )
 		},
 		function ( p_callback ) {
 
-			var main = new Main_lib ( redis , mysql , solr , feedId ) ;
-			main.makeRequest( url );
+			var main = new Main_lib ( redis , mysql , solr , feed_id ) ;
+			main.makeRequest( feed_url );
 			main.on ( 'finished' , function () {
-				console.log ( "feedId " + feedId + "\n" + main.articles ) ;
 				p_callback ( null , main.articles ) ;
 			} ) ;
 
 		}
 	],
 	function ( err , results ) {
-		console.log ( results ) ;
+		subscribers = results[0] ;
+		articles = results[1] ;
+		total_of_inserts_required += subscribers.length * articles.length ;
+		feeds_processed ++ ;
+		console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds ) ;
+		if ( feeds_processed == total_feeds && total_of_inserts_required == 0 )
+		{
+			console.log ( 'Killing the process - work is done here' ) ;
+			process.exit( );
+		}
+		addToUnreadArticles ( subscribers , articles ) ;
 	}) ;
 
 
 	callback(null);
+}
+
+
+function addToUnreadArticles ( subscribers , articles )
+{
+
+	async.each ( articles , function ( item_article , callback ) {
+
+			async.each ( subscribers , function ( item_user , p_callback ) {
+					mysql_set = { article_id : item_article.id , user_id : item_user } ;
+					insert_into_mysql ( mysql_set ) ;
+				},
+				function ( err ) {
+					if ( err )
+						console.log ( err ) ;
+				}
+			) ;
+
+		} ,
+		function ( err ) {
+			if ( err )
+				console.log ( err) ;
+		}
+	);
+
+}
+
+
+function insert_into_mysql ( mysql_set )
+{
+	mysql.getConnection ( function ( err , conn ) {
+		conn.query ( mysql_insert_query , mysql_set , function ( err , res) {
+			inserts_completed ++ ;
+			console.log ( inserts_completed + " out of " + total_of_inserts_required ) ;
+
+			if ( inserts_completed == total_of_inserts_required && feeds_processed == total_feeds )
+			{
+				console.log ( 'Killing the process - work is done here' ) ;
+				process.exit( );
+			}
+			conn.release();
+		});
+	});
 }

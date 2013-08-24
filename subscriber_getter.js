@@ -6,8 +6,9 @@ subscriber_url = "http://37.139.8.146:1234/subscribers/"
 function get_subscribers_for_feed ( feed_id )
 {
 	url = subscriber_url + feed_id ;
-	request( subscriber_url , function ( error , response , body ) {
+	request( url , function ( error , response , body ) {
 
+		console.log ( body ) ;
 		parsed = JSON.parse( body ) ;
 
 		subscribers = parsed["users"] ;
@@ -16,3 +17,5 @@ function get_subscribers_for_feed ( feed_id )
 		return subscribers ;
 	});
 }
+
+get_subscribers_for_feed(117);
