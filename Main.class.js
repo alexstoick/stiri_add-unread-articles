@@ -14,7 +14,7 @@ Main.prototype = Object.create(events.EventEmitter.prototype, {
 });
 
 
-function Main ( redis , mysql , solr , currentDate , feedId )
+function Main ( redis , mysql , solr , feedId )
 {
 
 	events.EventEmitter.call(this);
@@ -37,8 +37,6 @@ function Main ( redis , mysql , solr , currentDate , feedId )
 	this.parser.on ( 'endParse' , function ( count ) { self.count = count ; } ) ;
 	this.parser.on ( 'newArticle' , this.newArticle ) ;
 
-	console.log ( currentDate ) ;
-	this.currentDate = currentDate ;
 	this.articles = [] ;
 
 }
@@ -66,6 +64,15 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 				self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
 			}) ;
 		}
+		else
+		{
+			self.articles_proccessed ++ ;
+			if ( self.articles_proccessed === self.count )
+			{
+				console.log ( 'finished') ;
+				self.emit ( 'finished' ) ;
+			}
+		}
 	} ) ;
 }
 
@@ -91,9 +98,8 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 
 		connection.query ( self.mysql_query , mysql_set , function ( err , res ) {
 			console.log ( 'Added to MySQL') ;
-			console.log ( res.insertId ) ;
 
-			article = { url: url , mysql_id: res.insertId } ;
+			article = { id: res.insertId } ;
 			self.articles.push ( article ) ;
 
 			self.articles_proccessed ++ ;
@@ -105,7 +111,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 
 			if ( err )
 				console.log ( err ) ;
-			connection.end();
+			connection.release();
 		}) ;
 
 	})
