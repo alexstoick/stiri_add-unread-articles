@@ -4,6 +4,10 @@
 	"dependencies" :
 		{
 			"request" : "2.x" ,
-			"async" : "0.x"
+			"async" : "0.x" ,
+			"node-redis" : "0.x" ,
+			"mysql" : "2.x" ,
+			"solr-client" : "0.x" ,
+			"feedparser" : "0.x"
 		}
 }
