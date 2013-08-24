@@ -139,7 +139,7 @@ function insert_into_mysql ( mysql_set )
 				console.log ( 'Killing the process - work is done here' ) ;
 				process.exit( );
 			}
-			conn.release();
+			conn.end();
 		});
 	});
 }

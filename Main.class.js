@@ -111,7 +111,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 				self.articles.push ( article ) ;
 			}
 
-			connection.release();
+			connection.end();
 		}) ;
 
 	})
