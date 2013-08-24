@@ -42,6 +42,7 @@ function startProcessing ()
 	request(newssources_url , function ( error , response , body ) {
 
 		parsed = JSON.parse (body) ;
+		parsed = [ { "url": "http://www.theverge.com/rss/index.xml" , "id": 117 } ]
 		async.each ( parsed , processFeed , function ( err ) {
 			if ( err )
 				console.log ( err ) ;
@@ -49,33 +50,37 @@ function startProcessing ()
 	}) ;
 }
 
+
+
 function processFeed ( item , callback )
 {
 	url = item["url"] ;
-	id = item["id"] ;
-	subscribers = get_subscribers_for_feed ( id ) ;
+	feed_id = item["id"] ;
+
+	async.parrallel ( [
+		function ( p_callback ) {
+				url = subscriber_url + feed_id ;
+				request( url , function ( error , response , body ) {
+					parsed = JSON.parse( body ) ;
+					subscribers = parsed["users"] ;
+					p_callback ( null , subscribers ) ;
+				});
+		},
+		function ( p_callback ) {
+
+			var main = new Main_lib ( redis , mysql , solr , feedId ) ;
+			main.makeRequest( url );
+			main.on ( 'finished' , function () {
+				console.log ( "feedId " + feedId + "\n" + main.articles ) ;
+				p_callback ( null , main.articles ) ;
+			} ) ;
+
+		}
+	],
+	function ( err , results ) {
+		console.log ( results ) ;
+	}) ;
+
+
 	callback(null);
-}
-
-
-function get_subscribers_for_feed ( feed_id )
-{
-	url = subscriber_url + feed_id ;
-	request( url , function ( error , response , body ) {
-		parsed = JSON.parse( body ) ;
-		subscribers = parsed["users"] ;
-		return subscribers ;
-	});
-}
-
-function getArticles ( feedId , url )
-{
-
-	var main = new Main_lib ( redis , mysql , solr , feedId ) ;
-	main.makeRequest( url );
-
-	main.on ( 'finished' , function () {
-		console.log ( main.articles ) ;
-		return main.articles ;
-	} ) ;
 }

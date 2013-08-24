@@ -8,7 +8,7 @@ request(newssources_url , function ( error , response , body ) {
 
 	//console.log ( body ) ;
 	parsed = JSON.parse (body) ;
-
+	console.log ( parsed ) ;
 	async.each ( parsed , processFeed , function ( err ) {
 		if ( err )
 			console.log ( err ) ;
