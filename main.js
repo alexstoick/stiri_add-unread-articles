@@ -34,6 +34,8 @@ mysql_insert_query = "INSERT INTO unread_articles SET ?"
 newssources_url = 'http://stiriromania.eu01.aws.af.cm/newssource/'
 subscriber_url = "http://37.139.8.146:1234/subscribers/"
 
+console.log ( new Date() ) ;
+
 startProcessing();
 
 var total_of_inserts_required = 0 ;
