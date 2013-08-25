@@ -38,6 +38,11 @@ console.log ( new Date() ) ;
 
 startProcessing();
 
+setTimeout( function () { 
+	console.log ( "Taking too long - killing process" ) ;
+	 process.exit() ;
+	}, 60000 ) ;
+
 var total_of_inserts_required = 0 ;
 var inserts_completed = 0 ;
 
@@ -48,12 +53,19 @@ function startProcessing ()
 {
 	request(newssources_url , function ( error , response , body ) {
 
-		parsed = JSON.parse (body) ;
-		total_feeds = parsed.length ;
-		async.each ( parsed , processFeed , function ( err ) {
-			if ( err )
-				console.log ( err ) ;
-		}) ;
+		if ( error )
+		{
+			console.log ( "eroare la primit newssources" + error ) ;
+		}
+		else
+		{
+			parsed = JSON.parse (body) ;
+			total_feeds = parsed.length ;
+			async.each ( parsed , processFeed , function ( err ) {
+				if ( err )
+					console.log ( " eroare la procesare " + err ) ;
+			}) ;
+		}
 	}) ;
 }
 
@@ -88,7 +100,7 @@ function processFeed ( item , callback )
 		articles = results[1] ;
 		total_of_inserts_required += subscribers.length * articles.length ;
 		feeds_processed ++ ;
-		console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds ) ;
+		console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds + " " ) ;
 		if ( feeds_processed == total_feeds && total_of_inserts_required == 0 )
 		{
 			console.log ( 'Killing the process - work is done here' ) ;
@@ -113,14 +125,14 @@ function addToUnreadArticles ( subscribers , articles )
 				},
 				function ( err ) {
 					if ( err )
-						console.log ( err ) ;
+						console.log ( "eroare la async - adaugat in baza de date subscriberi " + err ) ;
 				}
 			) ;
 
 		} ,
 		function ( err ) {
 			if ( err )
-				console.log ( err) ;
+				console.log ( "eroare la async - adaugat in baza de date articole " +  err) ;
 		}
 	);
 

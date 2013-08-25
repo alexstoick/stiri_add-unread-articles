@@ -32,14 +32,13 @@ Parser.prototype.request = function ( url )
 
 	request(url)
 		.on('error', function (error) {
-			console.error(error);
+			console.log( "error la request feedului " + error + " 	" + url );
 		})
 		.pipe(new FeedParser())
 		.on('error', function (error) {
-			console.error(error);
+			console.log ( " error la feedparser " + error + " 		" + url ) ;
 		})
 		.on('meta', function (meta) {
-			console.log ( 'Feed title:  ' + meta.title ) ;
 			self.emit ( 'feedTitle' , meta.title ) ;
 		})
 		.on('readable', function() {

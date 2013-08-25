@@ -40,7 +40,7 @@ Solr.prototype.add = function ( object , callback ) {
 Solr.prototype.addCompleted = function ( error , response ) {
 
 	if ( error )
-		console.log ( error ) ;
+		console.log ( "Eroare la solr " + error ) ;
 	else
 	{
 		console.log ( 'Added to SOLR successfully' ) ;
