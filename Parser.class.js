@@ -44,7 +44,7 @@ Parser.prototype.request = function ( url )
 		.on('readable', function() {
 			var stream = this, item;
 			while (item = stream.read()) {
-				date = ( item.pubDate || item.published || item.date ) ;
+				date = ( item.pubDate || item.published || item.date || new Date() ) ;
 				image = item.image ;
 				self.count ++ ;
 				self.emit ( 'newArticle' , item.link , item.title , item.description , date ) ;
