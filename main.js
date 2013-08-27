@@ -31,7 +31,7 @@ var mysql = mysql_lib.createPool ({
 
 mysql_insert_query = "INSERT INTO unread_articles SET ?"
 
-newssources_url = 'http://stiriromania.eu01.aws.af.cm/newssource/'
+newssources_url = 'http://37.139.26.80/newssource/'
 subscriber_url = "http://37.139.8.146:1234/subscribers/"
 
 console.log ( new Date() ) ;
