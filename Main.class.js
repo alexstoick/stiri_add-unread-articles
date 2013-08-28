@@ -80,7 +80,10 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 	var self = instance ;
 	parsed = JSON.parse ( response ) ;
 	text = parsed ["response"] ;
-	image = parsed["images"][0] ;
+	if ( parsed["images"].length > 0)
+		image = parsed["images"][0] ;
+	else
+		image = null ;
 
 	mysql_set =  { url: url , title: title , text: text , description: description , created_at: pubDate , feed: self.feedId , image: image } ;
 	solr_set  =  { url: url , title: title , content: text , description: description , last_modified: self.date}
