@@ -55,8 +55,6 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 
 		if ( res == 0 )
 		{
-			//Setup key in redis
-			self.redis.set ( url , 'updated' ) ;
 
 			//get parserizer
 			request.get ( self.parserURL + url , function ( err , response, body ) {
@@ -111,6 +109,9 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 			{
 				article = { id: res.insertId } ;
 				self.articles.push ( article ) ;
+
+				//Setup key in redis
+				self.redis.set ( url , res.insertId ) ;
 
 				self.articles_proccessed_mysql ++ ;
 				if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
