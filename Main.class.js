@@ -55,8 +55,6 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 
 		if ( res == 0 )
 		{
-
-			//get parserizer
 			request.get ( self.parserURL + url , function ( err , response, body ) {
 				if ( err )
 					console.log ( 'request error' + err ) ;
@@ -79,6 +77,18 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 {
 	var self = instance ;
 	parsed = JSON.parse ( response ) ;
+	if ( parsed["error"] )
+	{
+		//gonna skip an article
+		console.log ( "skipped an article" ) ;
+		self.articles_proccessed_mysql ++ ;
+		self.articles_proccessed_solr ++ ;
+		if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+		{
+			self.emit ( 'finished' ) ;
+		}
+		return ;
+	}
 	text = parsed ["response"] ;
 	if ( parsed["images"].length > 0)
 		image = parsed["images"][0] ;
