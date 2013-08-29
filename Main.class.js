@@ -58,7 +58,8 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 			request.get ( self.parserURL + url , function ( err , response, body ) {
 				if ( err )
 					console.log ( 'request error' + err ) ;
-				self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
+				else
+					self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
 			}) ;
 		}
 		else
