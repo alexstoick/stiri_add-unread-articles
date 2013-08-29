@@ -33,9 +33,27 @@ function Main ( redis , mysql , solr , feedId )
 	this.articles_proccessed_mysql = 0 ;
 	this.articles_proccessed_solr = 0 ;
 	this.count = 500 ;
+	this.emmited_finish = false ;
 
 	var self = this ;
-	this.parser.on ( 'endParse' , function ( count ) { self.count = count ; } ) ;
+	this.parser.on ( 'endParse' , function ( count ) {
+		self.count = count ;
+		if ( count === 0 && self.articles_proccessed_mysql === 0 && self.articles_proccessed_solr == 0 && !self.emmited_finish )
+		 {
+		 	self.emit ( 'finished' ) ;
+		 }
+		 else
+			 setTimeout ( function () {
+			 	if ( !self.emmited_finish )
+			 	{
+			 		if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+						{
+							self.emmited_finish = true ;
+							self.emit ( 'finished' ) ;
+						}
+				}
+			 }, 1500 ) ;
+	} ) ;
 	this.parser.on ( 'newArticle' , this.newArticle ) ;
 
 	this.articles = [] ;
@@ -59,7 +77,20 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 				if ( err )
 					console.log ( 'request error' + err ) ;
 				else
-					self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
+					if ( response.statusCode == 200 )
+						self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
+					else
+					{
+						console.log ( 'eroare la parser ' + response.statusCode ) ;
+						self.articles_proccessed_mysql ++ ;
+						self.articles_proccessed_solr ++ ;
+						if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+						{
+							self.emmited_finish = true ;
+							self.emit ( 'finished' ) ;
+						}
+						return ;
+					}
 			}) ;
 		}
 		else
@@ -68,6 +99,7 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 			self.articles_proccessed_solr ++ ;
 			if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
 			{
+				self.emmited_finish = true ;
 				self.emit ( 'finished' ) ;
 			}
 		}
@@ -81,11 +113,13 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 	if ( parsed["error"] )
 	{
 		//gonna skip an article
+		self.redis.set ( url , 'skipped' ) ;
 		console.log ( "skipped an article" ) ;
 		self.articles_proccessed_mysql ++ ;
 		self.articles_proccessed_solr ++ ;
 		if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
 		{
+			self.emmited_finish = true ;
 			self.emit ( 'finished' ) ;
 		}
 		return ;
@@ -107,6 +141,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 		self.articles_proccessed_solr ++ ;
 		if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
 		{
+			self.emmited_finish = true ;
 			self.emit ( 'finished' ) ;
 		}
 	}) ;
@@ -130,6 +165,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 				self.articles_proccessed_mysql ++ ;
 				if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
 				{
+					self.emmited_finish = true ;
 					self.emit ( 'finished' ) ;
 				}
 			}

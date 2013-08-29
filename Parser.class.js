@@ -30,13 +30,15 @@ Parser.prototype.request = function ( url )
 
 	self.startDate = new Date() ;
 
-	request(url)
+	request(url , { "timeout" : 5000 })
 		.on('error', function (error) {
 			console.log( "error la request feedului " + error + " 	" + url );
+			self.emit ( 'endParse' , 0 ) ;
 		})
 		.pipe(new FeedParser())
 		.on('error', function (error) {
 			console.log ( " error la feedparser " + error + " 		" + url ) ;
+			self.emit ( 'endParse' , 0 ) ;
 		})
 		.on('meta', function (meta) {
 			self.emit ( 'feedTitle' , meta.title ) ;

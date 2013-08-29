@@ -73,16 +73,21 @@ function startProcessing ()
 
 function processFeed ( item , callback )
 {
-	feed_url = item["url"] ;
-	feed_id = item["id"] ;
+	var feed_url = item["url"] ;
+	var feed_id = item["id"] ;
 
-	async.parallel ( [
+	async.parallelLimit ( [
 		function ( p_callback ) {
-				url = subscriber_url + feed_id ;
+				var url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
-					parsed = JSON.parse( body ) ;
-					subscribers = parsed["users"] ;
-					p_callback ( null , subscribers ) ;
+					if ( error )
+						console.log ( 'eroare la luat subscriberi' + error )
+					else
+					{
+						parsed = JSON.parse( body ) ;
+						subscribers = parsed["users"] ;
+						p_callback ( null , subscribers ) ;
+					}
 				});
 		},
 		function ( p_callback ) {
@@ -94,19 +99,24 @@ function processFeed ( item , callback )
 			} ) ;
 
 		}
-	],
+	], 1 ,
 	function ( err , results ) {
-		subscribers = results[0] ;
-		articles = results[1] ;
-		total_of_inserts_required += subscribers.length * articles.length ;
-		feeds_processed ++ ;
-		console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds + " " ) ;
-		if ( feeds_processed == total_feeds && total_of_inserts_required == 0 )
+		if ( err )
+			console.log ( err );
+		else
 		{
-			console.log ( 'Killing the process - work is done here' ) ;
-			process.exit( );
+			subscribers = results[0] ;
+			articles = results[1] ;
+			total_of_inserts_required += subscribers.length * articles.length ;
+			feeds_processed ++ ;
+			console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds + " " ) ;
+			if ( feeds_processed == total_feeds && total_of_inserts_required == 0 )
+			{
+				console.log ( 'Killing the process - work is done here' ) ;
+				process.exit( );
+			}
+			addToUnreadArticles ( subscribers , articles ) ;
 		}
-		addToUnreadArticles ( subscribers , articles ) ;
 	}) ;
 
 
