@@ -41,7 +41,7 @@ startProcessing();
 setTimeout( function () { 
 	console.log ( "Taking too long - killing process" ) ;
 	 process.exit() ;
-	}, 60000 ) ;
+	}, 60000 * 5 - 1000 ) ;
 
 var total_of_inserts_required = 0 ;
 var inserts_completed = 0 ;
