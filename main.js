@@ -76,7 +76,7 @@ function processFeed ( item , callback )
 	var feed_url = item["url"] ;
 	var feed_id = item["id"] ;
 
-	async.parallel ( [
+	async.parallelLimmit ( [
 		function ( p_callback ) {
 				var url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
@@ -104,7 +104,7 @@ function processFeed ( item , callback )
 			} ) ;
 
 		}
-	],
+	], 1 ,
 	function ( err , results ) {
 		if ( err )
 			console.log ( err );
