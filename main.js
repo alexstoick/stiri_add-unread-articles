@@ -76,7 +76,7 @@ function processFeed ( item , callback )
 	var feed_url = item["url"] ;
 	var feed_id = item["id"] ;
 
-	async.parallelLimit ( [
+	async.parallel ( [
 		function ( p_callback ) {
 				var url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
@@ -93,13 +93,18 @@ function processFeed ( item , callback )
 		function ( p_callback ) {
 
 			var main = new Main_lib ( redis , mysql , solr , feed_id ) ;
+			var called = false ;
 			main.makeRequest( feed_url );
 			main.on ( 'finished' , function () {
-				p_callback ( null , main.articles ) ;
+				if ( ! called )
+				{
+					called = true ;
+					p_callback ( null , main.articles ) ;
+				}
 			} ) ;
 
 		}
-	], 1 ,
+	],
 	function ( err , results ) {
 		if ( err )
 			console.log ( err );
@@ -110,7 +115,7 @@ function processFeed ( item , callback )
 			total_of_inserts_required += subscribers.length * articles.length ;
 			feeds_processed ++ ;
 			console.log ( "Feeds: " + feeds_processed + " out of " + total_feeds + " " ) ;
-			if ( feeds_processed == total_feeds && total_of_inserts_required == 0 )
+			if ( feeds_processed == total_feeds && total_of_inserts_required == inserts_completed )
 			{
 				console.log ( 'Killing the process - work is done here' ) ;
 				process.exit( );
