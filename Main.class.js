@@ -131,7 +131,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 		image = null ;
 
 	mysql_set =  { url: url , title: title , text: text , description: description , created_at: pubDate , feed: self.feedId , image: image } ;
-	solr_set  =  { url: url , title: title , content: text , description: description , image: image , feed: self.feedId last_modified: self.date}
+	solr_set  =  { url: url , title: title , content: text , description: description , image: image , feed: self.feedId , last_modified: self.date}
 
 	self.solr.add ( solr_set , function ( err , res ) {
 		//solr callback
