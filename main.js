@@ -107,7 +107,7 @@ function processFeed ( item , callback )
 	], 1 ,
 	function ( err , results ) {
 		if ( err )
-			console.log ( err );
+			console.log ( 'eroare la async procesare feed ' + err );
 		else
 		{
 			subscribers = results[0] ;
@@ -158,13 +158,18 @@ function insert_into_mysql ( mysql_set )
 {
 	mysql.getConnection ( function ( err , conn ) {
 		conn.query ( mysql_insert_query , mysql_set , function ( err , res) {
-			inserts_completed ++ ;
-			console.log ( inserts_completed + " out of " + total_of_inserts_required ) ;
-
-			if ( inserts_completed == total_of_inserts_required && feeds_processed == total_feeds )
+			if ( err )
+				console.log ( 'eroare la inserat in baza de date ' + err ) ;
+			else
 			{
-				console.log ( 'Killing the process - work is done here' ) ;
-				process.exit( );
+				inserts_completed ++ ;
+				console.log ( inserts_completed + " out of " + total_of_inserts_required ) ;
+
+				if ( inserts_completed == total_of_inserts_required && feeds_processed == total_feeds )
+				{
+					console.log ( 'Killing the process - work is done here' ) ;
+					process.exit( );
+				}
 			}
 			conn.end();
 		});
