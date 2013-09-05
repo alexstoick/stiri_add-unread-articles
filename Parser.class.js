@@ -49,7 +49,7 @@ Parser.prototype.request = function ( url )
 				date = ( item.pubDate || item.published || item.date || new Date() ) ;
 				image = item.image ;
 				self.count ++ ;
-				self.emit ( 'newArticle' , item.link , item.title , item.description , date ) ;
+				self.emit ( 'newArticle' , item.link , item.title , item.description , image , date ) ;
 				self.start ++ ;
 
 			}

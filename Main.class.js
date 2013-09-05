@@ -65,7 +65,7 @@ Main.prototype.makeRequest = function ( url )
 	this.parser.request ( url ) ;
 }
 
-Main.prototype.newArticle = function ( url , title , description , pubDate ) {
+Main.prototype.newArticle = function ( url , title , description , image , pubDate ) {
 
 	var self = this.current_instance ;
 
@@ -78,7 +78,7 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 					console.log ( 'request error' + err ) ;
 				else
 					if ( response.statusCode == 200 )
-						self.addToSolrAndMySQL ( url , title , description , body , pubDate , self ) ;
+						self.addToSolrAndMySQL ( url , title , description , image , body , pubDate , self ) ;
 					else
 					{
 						console.log ( 'eroare la parser ' + response.statusCode ) ;
@@ -106,7 +106,7 @@ Main.prototype.newArticle = function ( url , title , description , pubDate ) {
 	} ) ;
 }
 
-Main.prototype.addToSolrAndMySQL = function ( url , title , description , response , pubDate , instance )
+Main.prototype.addToSolrAndMySQL = function ( url , title , description , image , response , pubDate , instance )
 {
 	var self = instance ;
 	parsed = JSON.parse ( response ) ;
@@ -125,13 +125,9 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 		return ;
 	}
 	text = parsed ["response"] ;
-	if ( parsed["images"].length > 0)
-		image = parsed["images"][0] ;
-	else
-		image = null ;
 
-	mysql_set =  { url: url , title: title , text: text , description: description , created_at: pubDate , feed: self.feedId , image: image } ;
-	solr_set  =  { url: url , title: title , content: text , description: description , image: image , feed: self.feedId , last_modified: self.date}
+	mysql_set =  { url: url , title: title , text: text , description: description , image: image , feed: self.feedId , created_at: pubDate } ;
+	solr_set  =  { url: url , title: title , content: text , description: description , image: image , feed: self.feedId , last_modified: self.date }
 
 	self.solr.add ( solr_set , function ( err , res ) {
 		//solr callback
