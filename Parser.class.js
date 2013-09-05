@@ -47,7 +47,10 @@ Parser.prototype.request = function ( url )
 			var stream = this, item;
 			while (item = stream.read()) {
 				date = ( item.pubDate || item.published || item.date || new Date() ) ;
-				image = item.image ;
+				image=null ;
+				if ( item["enclosures"].length > 0 )
+					image = item["enclosures"][0]["url"] ;
+				image = image || item.image["url"] || item.image  ;
 				self.count ++ ;
 				self.emit ( 'newArticle' , item.link , item.title , item.description , image , date ) ;
 				self.start ++ ;

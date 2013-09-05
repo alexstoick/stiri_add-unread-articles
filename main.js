@@ -47,7 +47,7 @@ console.log ( new Date() ) ;
 
 startProcessing();
 
-setTimeout( function () { 
+setTimeout( function () {
 	console.log ( "Taking too long - killing process" ) ;
 	 process.exit() ;
 	}, 60000 * 5 - 1000 ) ;
@@ -69,6 +69,12 @@ function startProcessing ()
 		else
 		{
 			parsed = JSON.parse (body) ;
+			parsed= [
+{
+url: "http://www.adevarul.ro/rss/",
+id: 118
+}
+]
 			total_feeds = parsed.length ;
 			async.each ( parsed , processFeed , function ( err ) {
 				if ( err )
