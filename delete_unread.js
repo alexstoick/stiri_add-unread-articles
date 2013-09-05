@@ -4,7 +4,7 @@ var async = require ( 'async' ) ;
 
 var mysql_lib = require ( 'mysql' ) ;
 
-HOST = '37.139.8.146' ;
+HOST = '37.139.26.80' ;
 
 var mysql = mysql_lib.createPool ({
 	host: HOST ,

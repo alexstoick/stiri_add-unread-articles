@@ -137,23 +137,32 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , respon
 		//solr callback
 		console.log ( 'Added to SOLR') ;
 		if ( err )
-			console.log ( err ) ;
-		self.articles_proccessed_solr ++ ;
-		if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+			console.log ( 'eroare la solr' + err ) ;
+		else
 		{
-			self.emmited_finish = true ;
-			self.emit ( 'finished' ) ;
+			self.articles_proccessed_solr ++ ;
+			if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+			{
+				self.emmited_finish = true ;
+				self.emit ( 'finished' ) ;
+			}
 		}
 	}) ;
 
 	self.mysql.getConnection ( function ( err , mysql_con ) {
+
+		if ( err )
+		{
+			console.log ( "eroare la luat conexiune " + err ) ;
+			return;
+		}
 
 		var connection = mysql_con ;
 
 		connection.query ( self.mysql_query , mysql_set , function ( err , res ) {
 			console.log ( 'Added to MySQL') ;
 			if ( err )
-				console.log ( err ) ;
+				console.log ( 'mysql error' + err ) ;
 			else
 			{
 				article = { id: res.insertId } ;

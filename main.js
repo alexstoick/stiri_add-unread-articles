@@ -26,8 +26,17 @@ var mysql = mysql_lib.createPool ({
 	user : 'root',
 	passsword: 'Wireless123',
 	database: 'stiriAPI',
-	connectionLimit: 250
+	connectionLimit: 100
 }) ;
+
+var mysql_rails = mysql_lib.createPool ({
+	host: '37.139.26.80' ,
+	user : 'root',
+	passsword: 'Wireless123',
+	database: 'stiriAPI',
+	connectionLimit: 100
+}) ;
+
 
 mysql_insert_query = "INSERT INTO unread_articles SET ?"
 
@@ -120,7 +129,7 @@ function processFeed ( item , callback )
 				console.log ( 'Killing the process - work is done here' ) ;
 				process.exit( );
 			}
-			addToUnreadArticles ( subscribers , articles ) ;
+			addToUnreadArticles ( subscribers , articles , feed_id ) ;
 		}
 	}) ;
 
@@ -129,13 +138,13 @@ function processFeed ( item , callback )
 }
 
 
-function addToUnreadArticles ( subscribers , articles )
+function addToUnreadArticles ( subscribers , articles , feed_id )
 {
 
 	async.each ( articles , function ( item_article , callback ) {
 
 			async.each ( subscribers , function ( item_user , p_callback ) {
-					mysql_set = { article_id : item_article.id , user_id : item_user } ;
+					mysql_set = { article_id : item_article.id , user_id : item_user , newsgroup_id: feed_id } ;
 					insert_into_mysql ( mysql_set ) ;
 				},
 				function ( err ) {
@@ -156,7 +165,7 @@ function addToUnreadArticles ( subscribers , articles )
 
 function insert_into_mysql ( mysql_set )
 {
-	mysql.getConnection ( function ( err , conn ) {
+	mysql_rails.getConnection ( function ( err , conn ) {
 		conn.query ( mysql_insert_query , mysql_set , function ( err , res) {
 			if ( err )
 				console.log ( 'eroare la inserat in baza de date ' + err ) ;
