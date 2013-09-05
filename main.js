@@ -69,12 +69,6 @@ function startProcessing ()
 		else
 		{
 			parsed = JSON.parse (body) ;
-			parsed= [
-{
-url: "http://www.adevarul.ro/rss/",
-id: 118
-}
-]
 			total_feeds = parsed.length ;
 			async.each ( parsed , processFeed , function ( err ) {
 				if ( err )
