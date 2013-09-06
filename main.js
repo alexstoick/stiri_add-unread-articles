@@ -85,7 +85,7 @@ function processFeed ( item , callback )
 	var feed_url = item["url"] ;
 	var feed_id = item["id"] ;
 
-	async.parallel ( [
+	async.parallelLimit ( [
 		function ( p_callback ) {
 				var url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
@@ -98,7 +98,7 @@ function processFeed ( item , callback )
 						p_callback ( null , subscribers ) ;
 					}
 				});
-		},
+		}, 1,
 		function ( p_callback ) {
 
 			var main = new Main_lib ( redis , mysql , solr , feed_id ) ;
