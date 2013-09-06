@@ -47,10 +47,10 @@ console.log ( new Date() ) ;
 
 startProcessing();
 
-// setTimeout( function () {
-// 	console.log ( "Taking too long - killing process" ) ;
-// 	 process.exit() ;
-// 	}, 60000 * 5 - 1000 ) ;
+setTimeout( function () {
+	console.log ( "Taking too long - killing process" ) ;
+	 process.exit() ;
+	}, 60000 * 5 - 1000 ) ;
 
 var total_of_inserts_required = 0 ;
 var inserts_completed = 0 ;
@@ -98,7 +98,7 @@ function processFeed ( item , callback )
 						p_callback ( null , subscribers ) ;
 					}
 				});
-		}, 1,
+		},
 		function ( p_callback ) {
 
 			var main = new Main_lib ( redis , mysql , solr , feed_id ) ;
@@ -113,7 +113,7 @@ function processFeed ( item , callback )
 			} ) ;
 
 		}
-	], 
+	], 1 ,
 	function ( err , results ) {
 		if ( err )
 			console.log ( 'eroare la async procesare feed ' + err );
