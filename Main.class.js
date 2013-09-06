@@ -75,7 +75,17 @@ Main.prototype.newArticle = function ( url , title , description , image , pubDa
 		{
 			request.get ( self.parserURL + url , function ( err , response, body ) {
 				if ( err )
+				{
 					console.log ( 'request error' + err ) ;
+					self.articles_proccessed_mysql ++ ;
+					self.articles_proccessed_solr ++ ;
+					if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+					{
+						self.emmited_finish = true ;
+						self.emit ( 'finished' ) ;
+					}
+					return ;
+				}
 				else
 					if ( response.statusCode == 200 )
 						self.addToSolrAndMySQL ( url , title , description , image , body , pubDate , self ) ;

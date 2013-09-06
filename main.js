@@ -47,10 +47,10 @@ console.log ( new Date() ) ;
 
 startProcessing();
 
-setTimeout( function () {
-	console.log ( "Taking too long - killing process" ) ;
-	 process.exit() ;
-	}, 60000 * 5 - 1000 ) ;
+// setTimeout( function () {
+// 	console.log ( "Taking too long - killing process" ) ;
+// 	 process.exit() ;
+// 	}, 60000 * 5 - 1000 ) ;
 
 var total_of_inserts_required = 0 ;
 var inserts_completed = 0 ;
@@ -85,7 +85,7 @@ function processFeed ( item , callback )
 	var feed_url = item["url"] ;
 	var feed_id = item["id"] ;
 
-	async.parallelLimit ( [
+	async.parallel ( [
 		function ( p_callback ) {
 				var url = subscriber_url + feed_id ;
 				request( url , function ( error , response , body ) {
@@ -113,7 +113,7 @@ function processFeed ( item , callback )
 			} ) ;
 
 		}
-	], 1 ,
+	], 
 	function ( err , results ) {
 		if ( err )
 			console.log ( 'eroare la async procesare feed ' + err );
