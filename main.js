@@ -69,8 +69,9 @@ function startProcessing ()
 		else
 		{
 			parsed = JSON.parse (body) ;
-			total_feeds = parsed.length ;
-			async.each ( parsed , processFeed , function ( err ) {
+			feeds = parsed["feeds"] ;
+			total_feeds = feeds.length ;
+			async.each ( feeds , processFeed , function ( err ) {
 				if ( err )
 					console.log ( " eroare la procesare " + err ) ;
 			}) ;
