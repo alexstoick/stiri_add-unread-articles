@@ -51,6 +51,8 @@ Parser.prototype.request = function ( url )
 				if ( item["enclosures"].length > 0 )
 					image = item["enclosures"][0]["url"] ;
 				image = image || item.image["url"] || item.image  ;
+				if ( isEmpty(image) )
+					image = null ;
 				self.count ++ ;
 				self.emit ( 'newArticle' , item.link , item.title , item.description , image , date ) ;
 				self.start ++ ;
@@ -67,4 +69,9 @@ Parser.prototype.emmitRequestFinished = function ( parent )
 	var self = parent ;
 	self.end = new Date() ;
 	self.emit ( 'endParse' , self.count ) ;
+}
+
+
+function isEmpty(obj) {
+    return !Object.keys(obj).length > 0;
 }
