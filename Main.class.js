@@ -141,11 +141,11 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 
 	self.solr.add ( solr_set , function ( err , res ) {
 		//solr callback
-		console.log ( 'Added to SOLR') ;
 		if ( err )
 			console.log ( 'eroare la solr' + err ) ;
 		else
 		{
+			console.log ( 'Added to SOLR') ;
 			self.articles_proccessed_solr ++ ;
 			if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
 			{
@@ -166,23 +166,25 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 		var connection = mysql_con ;
 
 		connection.query ( self.mysql_query , mysql_set , function ( err , res ) {
-			console.log ( 'Added to MySQL') ;
 			if ( err )
+			{
 				console.log ( 'mysql error' + err ) ;
+			}
 			else
 			{
+				console.log ( 'Added to MySQL') ;
 				article = { id: res.insertId } ;
 				self.articles.push ( article ) ;
 
 				//Setup key in redis
 				self.redis.set ( url , res.insertId ) ;
+			}
 
-				self.articles_proccessed_mysql ++ ;
-				if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
-				{
-					self.emmited_finish = true ;
-					self.emit ( 'finished' ) ;
-				}
+			self.articles_proccessed_mysql ++ ;
+			if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+			{
+				self.emmited_finish = true ;
+				self.emit ( 'finished' ) ;
 			}
 			connection.end();
 		}) ;
