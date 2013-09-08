@@ -51,7 +51,7 @@ Parser.prototype.request = function ( url )
 				if ( item["enclosures"].length > 0 )
 					image = item["enclosures"][0]["url"] ;
 				image = image || item.image["url"] || item.image  ;
-				if ( isEmpty(image) )
+				if ( image != null && isEmpty(image) )
 					image = null ;
 				self.count ++ ;
 				self.emit ( 'newArticle' , item.link , item.title , item.description , image , date ) ;
