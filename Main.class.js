@@ -139,22 +139,6 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 	mysql_set =  { url: url , title: title , text: text , description: description , image: image , feed: self.feedId , created_at: pubDate } ;
 	solr_set  =  { url: url , title: title , content: text , description: description , image: image , feed: self.feedId , last_modified: self.date }
 
-	self.solr.add ( solr_set , function ( err , res ) {
-		//solr callback
-		if ( err )
-			console.log ( 'eroare la solr' + err ) ;
-		else
-		{
-			console.log ( 'Added to SOLR') ;
-			self.articles_proccessed_solr ++ ;
-			if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
-			{
-				self.emmited_finish = true ;
-				self.emit ( 'finished' ) ;
-			}
-		}
-	}) ;
-
 	self.mysql.getConnection ( function ( err , mysql_con ) {
 
 		if ( err )
@@ -172,6 +156,22 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 			}
 			else
 			{
+				self.solr.add ( solr_set , function ( err , res ) {
+					//solr callback
+					if ( err )
+						console.log ( 'eroare la solr' + err ) ;
+					else
+					{
+						console.log ( 'Added to SOLR') ;
+						self.articles_proccessed_solr ++ ;
+						if ( self.articles_proccessed_mysql === self.count && self.articles_proccessed_solr === self.count )
+						{
+							self.emmited_finish = true ;
+							self.emit ( 'finished' ) ;
+						}
+					}
+				}) ;
+
 				console.log ( 'Added to MySQL') ;
 				article = { id: res.insertId } ;
 				self.articles.push ( article ) ;
