@@ -150,8 +150,10 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 		var connection = mysql_con ;
 
 		connection.query ( self.mysql_query , mysql_set , function ( err , res ) {
+			connection.end();
 			if ( err )
 			{
+				self.redis.setex ( url , 86400 , 'dupped' ) ;
 				console.log ( 'mysql error' + err ) ;
 			}
 			else
@@ -177,7 +179,7 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 				self.articles.push ( article ) ;
 
 				//Setup key in redis
-				self.redis.set ( url , res.insertId ) ;
+				self.redis.setex ( url , 86400 , res.insertId ) ;
 			}
 
 			self.articles_proccessed_mysql ++ ;
@@ -186,7 +188,6 @@ Main.prototype.addToSolrAndMySQL = function ( url , title , description , image 
 				self.emmited_finish = true ;
 				self.emit ( 'finished' ) ;
 			}
-			connection.end();
 		}) ;
 
 	})
