@@ -167,21 +167,26 @@ function addToUnreadArticles ( subscribers , articles , feed_id )
 function insert_into_mysql ( mysql_set )
 {
 	mysql_rails.getConnection ( function ( err , conn ) {
-		conn.query ( mysql_insert_query , mysql_set , function ( err , res) {
-			if ( err )
-				console.log ( 'eroare la inserat in baza de date ' + err ) ;
-			else
-			{
-				inserts_completed ++ ;
-				console.log ( inserts_completed + " out of " + total_of_inserts_required ) ;
-
-				if ( inserts_completed == total_of_inserts_required && feeds_processed == total_feeds )
+		if ( err )
+			console.log ( "Eroare la luat conexiunea de rails" ) ;
+		else
+		{
+			conn.query ( mysql_insert_query , mysql_set , function ( err , res) {
+				if ( err )
+					console.log ( 'eroare la inserat in baza de date ' + err ) ;
+				else
 				{
-					console.log ( 'Killing the process - work is done here' ) ;
-					process.exit( );
+					inserts_completed ++ ;
+					console.log ( inserts_completed + " out of " + total_of_inserts_required ) ;
+
+					if ( inserts_completed == total_of_inserts_required && feeds_processed == total_feeds )
+					{
+						console.log ( 'Killing the process - work is done here' ) ;
+						process.exit( );
+					}
 				}
-			}
-			conn.end();
-		});
+				conn.end();
+			});
+		}
 	});
 }
